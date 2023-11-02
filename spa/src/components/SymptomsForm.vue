@@ -47,7 +47,7 @@
   </v-form> -->
 
   <!-- <v-card height="200px" class="d-flex justify-center align-center"> -->
-  <v-container style="max-width: 800px; height: 400px;">
+  <v-container style="max-width: 800px; height: 400px">
     <v-row>
       <v-col>
         <!-- <v-card class="mx-auto mt-4" max-width="400"> -->
@@ -57,13 +57,13 @@
               <v-row>
                 <v-col cols="2"> </v-col>
                 <v-col cols="8">
-                  <v-window-item style="height: 500px;">
+                  <v-window-item style="height: 500px">
                     <v-card-text>
                       <h2 class="text-h6 mb-2">Choose all symptoms observed today</h2>
 
-                      <v-chip-group v-model="observations" column multiple>
+                      <v-chip-group v-model="observedSymptomIndexes" column multiple>
                         <v-chip
-                          v-for="symptom in symptoms"
+                          v-for="symptom in possibleSymptoms"
                           :key="symptom.symptom"
                           filter
                           :append-icon="symptom.icon"
@@ -73,8 +73,32 @@
                       </v-chip-group>
                     </v-card-text>
                   </v-window-item>
-                  <v-window-item v-for="window in windows" :key="window.index" style="height: 500px;">
-                    <span class="text-h2">{{ window.symptom }}</span>
+                  <v-window-item style="height: 500px">
+                    <v-card-text>
+                      <h2 class="text-h6 mb-2">Were any retractions observed?</h2>
+                    </v-card-text>
+                    <v-checkbox v-model="retractions" label="Rib area" value="rib"></v-checkbox>
+                    <v-checkbox
+                      v-model="retractions"
+                      label="Above the collarbone"
+                      value="collarbone"
+                    ></v-checkbox>
+                  </v-window-item>
+                  <v-window-item v-if="showFever" style="height: 500px">
+                    <v-card-text>
+                      <h2 class="text-h6 mb-2">What was the fever temperature?</h2>
+                    </v-card-text>
+                    <v-text-field
+                      v-model="temperature"
+                      label="Temperature"
+                      type="number"
+                      step=".1"
+                      min="0"
+                      suffix="°F"
+                    ></v-text-field>
+                  </v-window-item>
+                  <v-window-item style="height: 500px">
+                    <v-btn @click="submit"> Submit Symptoms </v-btn>
                   </v-window-item>
                 </v-col>
                 <v-col cols="2"> </v-col>
@@ -89,25 +113,46 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useSymptomsStore } from '@/stores/symptoms'
+import { useObservationsStore } from '@/stores/observations'
 
-const symptoms: { symptom: string; icon: string }[] = [
-  { symptom: 'Chest Congestion', icon: 'mdi-liquid-spot' },
-  { symptom: 'Shortness of Breath', icon: 'mdi-lungs' },
-  { symptom: 'Coughing', icon: 'mdi-account-voice' },
-  { symptom: 'Wheezing', icon: 'mdi-weather-dust' },
-  { symptom: 'Fatigue', icon: 'mdi-eye-closed' },
-  { symptom: 'Fever', icon: 'mdi-emoticon-sick' }
-]
+const emit = defineEmits<{
+  submit: []
+}>()
+
+const symptomsStore = useSymptomsStore()
+const observationsStore = useObservationsStore()
+
+const possibleSymptoms = computed(() => symptomsStore.symptoms)
 
 const window = ref(0)
-const observations = ref([2])
+const observedSymptomIndexes = ref([])
 
-const windows = computed(() => {
-  return observations.value.map((index) => ({ index, ...symptoms[index] }))
+const observedSymptoms = computed(() => {
+  return observedSymptomIndexes.value.map((index) => ({ index, ...possibleSymptoms.value[index] }))
 })
 
-function click() {
-  console.log('sup')
+const showFever = computed(() =>
+  observedSymptoms.value.some((symptom) => symptom.symptom === 'Fever')
+)
+
+const retractions = ref([])
+
+const temperature = ref()
+
+function submit() {
+  const observation: string[] = [
+    ...observedSymptoms.value.map((symptom) => symptom.symptom),
+    ...retractions.value.map((retraction) => `${retraction} retraction`)
+  ]
+
+  const feverIndex = observation.findIndex((observation) => observation === 'Fever')
+  if (feverIndex > -1 && temperature.value) {
+    observation[feverIndex] = `${temperature.value} °F fever`
+  }
+
+  observationsStore.addObservation(observation)
+  emit('submit')
 }
 </script>
 <style scoped></style>

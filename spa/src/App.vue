@@ -5,7 +5,7 @@ import HelloWorld from './components/HelloWorld.vue'
 
 <template>
   <v-app class="rounded rounded-md">
-    <v-app-bar title="Application bar"></v-app-bar>
+    <v-app-bar title="CF Symptoms Tracker"></v-app-bar>
 
     <!-- <v-navigation-drawer>
       <v-list>
@@ -17,12 +17,11 @@ import HelloWorld from './components/HelloWorld.vue'
       </v-list>
     </v-navigation-drawer> -->
 
-    <v-main class="d-flex align-center justify-center" style="min-height: 300px;">
+    <!-- <v-main class="d-flex align-center justify-center" style="min-height: 300px;"> -->
+    <v-main class="d-flex justify-center" style="min-height: 300px">
       <RouterView />
     </v-main>
   </v-app>
 </template>
 
-<style scoped>
-
-</style>
+<style scoped></style>

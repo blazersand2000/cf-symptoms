@@ -1,33 +1,48 @@
 <template>
-  <v-row justify="center">
-    <v-dialog v-model="dialog" fullscreen :scrim="false" transition="dialog-bottom-transition">
-      <template v-slot:activator="{ props }">
-        <v-btn color="primary" dark v-bind="props">Add Observation</v-btn>
-      </template>
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-btn icon dark @click="dialog = false">
-            <v-icon icon="mdi-close" />
-          </v-btn>
-          <v-toolbar-title>Add Observation</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-toolbar-items>
-            <v-btn variant="text" @click="dialog = false"> Save </v-btn>
-          </v-toolbar-items>
-        </v-toolbar>
-        <SymptomsForm />
-      </v-card>
-    </v-dialog>
-  </v-row>
+  <v-container style="max-width: 800px">
+    <v-row style="mx-auto">
+      <v-col cols="12" class="d-flex justify-center">
+        <v-dialog v-model="dialog" fullscreen :scrim="false" transition="dialog-bottom-transition">
+          <template v-slot:activator="{ props }">
+            <v-btn color="primary" dark v-bind="props">Add Observation</v-btn>
+          </template>
+          <v-card>
+            <v-toolbar dark color="primary">
+              <v-btn icon dark @click="dialog = false">
+                <v-icon icon="mdi-close" />
+              </v-btn>
+              <v-toolbar-title>Add Observation</v-toolbar-title>
+              <v-spacer></v-spacer>
+              <v-toolbar-items>
+                <!-- <v-btn variant="text" @click="dialog = false"> Save </v-btn> -->
+              </v-toolbar-items>
+            </v-toolbar>
+            <SymptomsForm @submit="handleSubmit" />
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
+    <v-row justify="center">
+      <v-col cols="12" class="d-flex justify-center" v-for="observation in observationsStore.allObservations">
+         <v-card :subtitle="observation.timestamp" variant="tonal">
+            <v-list :items="observation.observations" density="compact"></v-list>
+         </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 <script setup lang="ts">
-import SymptomsForm from "@/components/SymptomsForm.vue";
+import SymptomsForm from '@/components/SymptomsForm.vue'
 import { ref } from 'vue'
+import { useObservationsStore } from '@/stores/observations'
+
+const observationsStore = useObservationsStore()
 
 const dialog = ref(false)
-const notifications = ref(false)
-const sound = ref(false)
-const widgets = ref(false)
+
+function handleSubmit() {
+  dialog.value = false
+}
 </script>
 <style>
 .dialog-bottom-transition-enter-active,

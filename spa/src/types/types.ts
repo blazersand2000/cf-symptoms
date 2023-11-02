@@ -4,3 +4,8 @@ export interface Symptom {
    severity: 'mild' | 'moderate' | 'severe'; // Severity level
    // Add other properties specific to a symptom if needed
  }
+
+ export interface Observation {
+   observations: string[],
+   timestamp: Date
+ }
