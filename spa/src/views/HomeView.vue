@@ -23,9 +23,10 @@
       </v-col>
     </v-row>
     <v-row justify="center">
-      <v-col cols="12" class="d-flex justify-center" v-for="observation in observationsStore.allObservations">
-         <v-card :subtitle="observation.timestamp" variant="tonal">
-            <v-list :items="observation.observations" density="compact"></v-list>
+      <v-col cols="12" class="d-flex justify-center" v-for="observation in allObservations">
+         <v-card :subtitle="observation.formattedTimestamp" variant="tonal">
+            <!-- <v-list :items="observation." density="compact"></v-list> -->
+            {{ observation }}
          </v-card>
       </v-col>
     </v-row>
@@ -33,16 +34,21 @@
 </template>
 <script setup lang="ts">
 import SymptomsForm from '@/components/SymptomsForm.vue'
-import { ref } from 'vue'
-import { useObservationsStore } from '@/stores/observations'
+import { computed, ref } from 'vue'
+import { useObservations } from '@/composables/observations';
 
-const observationsStore = useObservationsStore()
+const { allObservations } = useObservations()
 
 const dialog = ref(false)
 
 function handleSubmit() {
   dialog.value = false
 }
+
+// const showFever = computed(() =>
+  
+// )
+
 </script>
 <style>
 .dialog-bottom-transition-enter-active,

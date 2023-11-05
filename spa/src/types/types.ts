@@ -1,5 +1,3 @@
-import { inherits } from 'util'
-
 export interface Symptom {
   name: string // Name of the symptom (e.g., "Cough")
   //description: string; // Description of the symptom
@@ -39,13 +37,15 @@ export interface Symptom {
 //   icon: string
 // }
 
-export interface ObservationInfo extends Observation<ObservationInfo> {}
+export interface ObservationInfo extends Observation<ObservationInfoItem> {}
 
-export interface ConcreteObservation extends Observation<ConcreteObservation> {}
+export interface ConcreteObservation extends Observation<ConcreteObservationItem> {}
 
 export interface NewConcreteObservation extends ConcreteObservation {}
 
-export interface SavedConcreteObservation extends ConcreteObservation {
+export interface SavedConcreteObservation extends ConcreteObservation, TimestampedObservation {}
+
+interface TimestampedObservation {
    timestamp: Date
 }
 
@@ -53,7 +53,10 @@ export interface DisplayedConcreteObservation extends SavedConcreteObservation {
    formattedTimestamp: string
 }
 
-export interface ConcreteObservationItem {}
+export interface ConcreteObservationItem {
+   observed: boolean
+}
+
 export interface Fever extends ConcreteObservationItem {
    temperature: number
 }
@@ -62,22 +65,54 @@ export interface Cough extends ConcreteObservationItem {
    phlegm: boolean
 }
 
-export interface Observation<T extends ObservationInfo | ConcreteObservation> {
-   measurements: {
-     collarBoneRetraction: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-     ribRetraction: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-   }
-   symptoms: {
-      chestCongestion: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-      shortnessOfBreath: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-      cough: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-      wheezing: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-      fatigue: T extends ObservationInfo ? ObservationInfoItem : ConcreteObservationItem
-      fever: T extends ObservationInfo ? ObservationInfoItem : Fever
-   }
+type ObservationType = ObservationInfoItem | ConcreteObservationItem
+
+export interface Measurements<T extends ObservationType> {
+   collarBoneRetraction: T
+   ribRetraction: T
+}
+
+export interface Symptoms<T extends ObservationType> {
+   chestCongestion: T
+   shortnessOfBreath: T
+   cough: T
+   wheezing: T
+   fatigue: T
+   fever: T extends ConcreteObservationItem ? Fever : T
+}
+
+export interface Observation<T extends ObservationType> {
+   measurements: Measurements<T>
+   symptoms: Symptoms<T>
  }
  
 export interface ObservationInfoItem {
    displayName: string
    icon: string
 }
+
+export function defaultConcreteObservation(): NewConcreteObservation {
+   const defaultObservationItem: ConcreteObservationItem = {
+     observed: false,
+   };
+ 
+   const defaultObservation: NewConcreteObservation = {
+     measurements: {
+       collarBoneRetraction: defaultObservationItem,
+       ribRetraction: defaultObservationItem,
+     },
+     symptoms: {
+       chestCongestion: defaultObservationItem,
+       shortnessOfBreath: defaultObservationItem,
+       cough: defaultObservationItem,
+       wheezing: defaultObservationItem,
+       fatigue: defaultObservationItem,
+       fever: {
+         observed: false,
+         temperature: 0,
+       },
+     },
+   };
+ 
+   return defaultObservation;
+ }
