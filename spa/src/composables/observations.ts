@@ -8,6 +8,14 @@ export function useObservations() {
   const allObservations = computed<DisplayedConcreteObservation[]>(() =>
     observationsStore.allObservations.map((observation) => ({
       ...observation,
+      measurements: {
+         ...observation.measurements,
+         ...observationInfo.value.measurements,
+      },
+      symptoms: {
+         ...observation.symptoms,
+         ...observationInfo.value.symptoms,
+      },
       formattedTimestamp: observation.timestamp.toLocaleString()
     }))
   )

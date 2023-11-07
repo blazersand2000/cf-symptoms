@@ -49,7 +49,7 @@ interface TimestampedObservation {
    timestamp: Date
 }
 
-export interface DisplayedConcreteObservation extends SavedConcreteObservation {
+export interface DisplayedConcreteObservation extends Observation<ConcreteObservationItem & ObservationInfoItem>, TimestampedObservation {
    formattedTimestamp: string
 }
 
@@ -78,7 +78,7 @@ export interface Symptoms<T extends ObservationType> {
    cough: T
    wheezing: T
    fatigue: T
-   fever: T extends ConcreteObservationItem ? Fever : T
+   fever: T extends(ObservationInfoItem) ? T : (Fever & T)
 }
 
 export interface Observation<T extends ObservationType> {

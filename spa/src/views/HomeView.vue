@@ -24,10 +24,7 @@
     </v-row>
     <v-row justify="center">
       <v-col cols="12" class="d-flex justify-center" v-for="observation in allObservations">
-         <v-card :subtitle="observation.formattedTimestamp" variant="tonal">
-            <!-- <v-list :items="observation." density="compact"></v-list> -->
-            {{ observation }}
-         </v-card>
+         <ObservationCard :observation="observation" />
       </v-col>
     </v-row>
   </v-container>
@@ -36,6 +33,7 @@
 import SymptomsForm from '@/components/SymptomsForm.vue'
 import { computed, ref } from 'vue'
 import { useObservations } from '@/composables/observations';
+import ObservationCard from '@/components/ObservationCard.vue';
 
 const { allObservations } = useObservations()
 
