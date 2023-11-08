@@ -114,9 +114,9 @@
   <!-- <v-btn @click="click">Submit Symptoms</v-btn> -->
 </template>
 <script setup lang="ts">
+import { useObservations } from '@/composables/observations'
+import type { Items, Observation } from '@/types/types'
 import { ref, computed } from 'vue'
-import { useObservations } from "@/composables/observations";
-import { type NewConcreteObservation, type Symptoms, type ConcreteObservation, type ConcreteObservationItem, type ObservationInfoItem, type ObservationInfo, type Measurements, defaultConcreteObservation } from '@/types/types';
 
 const emit = defineEmits<{
   submit: []
@@ -124,46 +124,34 @@ const emit = defineEmits<{
 
 const { observationInfo, addObservation } = useObservations()
 
-const possibleSymptoms = computed(() => observationInfo.value.symptoms)
-const possibleMeasurements = computed(() => observationInfo.value.measurements)
+const possibleSymptoms = computed(() =>
+  Object.values(observationInfo.value).filter((entry) => entry.type === 'symptom')
+)
+const possibleMeasurements = computed(() =>
+  Object.values(observationInfo.value).filter((entry) => entry.type === 'measurement')
+)
 
 const window = ref(0)
 
-const observedSymptomKeys = ref<(keyof Symptoms<ConcreteObservationItem>)[]>([])
-const observedSymptoms = computed(() => {
-   const symptoms = defaultConcreteObservation().symptoms
-   observedSymptomKeys.value.forEach(key => {
-      symptoms[key].observed = true
-   })
-   if (symptoms.fever.observed) {
-      symptoms.fever.temperature = temperature.value
-   }
-   return symptoms
+const observedSymptomKeys = ref([])
+const observedMeasurementKeys = ref([])
+
+const observation = computed<Observation>(() => {
+  const obs: Observation = {
+    items: {}
+  }
+  observedSymptomKeys.value.concat(observedMeasurementKeys.value).forEach((key) => {
+   obs.items[key as keyof Items] = {temperature: temperature.value}
+  })
+  return obs
 })
 
-const observedMeasurementKeys = ref<(keyof Measurements<ConcreteObservationItem>)[]>([])
-const observedMeasurements = computed(() => {
-   const measurements = defaultConcreteObservation().measurements
-   observedMeasurementKeys.value.forEach(key => {
-      measurements[key] = {
-         observed: true
-      }
-   })
-   return measurements
-})
-
-const observation = computed<NewConcreteObservation>(() => ({
-   measurements: observedMeasurements.value,
-   symptoms: observedSymptoms.value
-}))
-
-const showFever = computed(() =>
-  observedSymptoms.value.fever.observed
-)
+const showFever = computed(() => !!observation.value.items.fever)
 
 const temperature = ref()
 
 function submit() {
+   console.log(observation.value)
   addObservation(observation.value)
   emit('submit')
 }

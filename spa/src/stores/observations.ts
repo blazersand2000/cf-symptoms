@@ -1,16 +1,13 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type {
-  DisplayedConcreteObservation,
-  NewConcreteObservation,
-  ObservationInfo,
-  SavedConcreteObservation
+  SavedObservation
 } from '@/types/types'
 
 export const useObservationsStore = defineStore('observations', () => {
-  const observations = ref<SavedConcreteObservation[]>([])
+  const observations = ref<SavedObservation[]>([])
   const allObservations = computed(() => observations.value)
-  function addObservation(observation: SavedConcreteObservation) {
+  function addObservation(observation: SavedObservation) {
     observations.value.push(observation)
   }
 

@@ -1,18 +1,18 @@
 <template>
    <v-card :subtitle="observation.formattedTimestamp" variant="tonal">
-     <v-list :items="items" density="compact"></v-list>
+     <v-list :items="items" item-title="value" density="compact"></v-list>
    </v-card>
  </template>
  <script setup lang="ts">
-import type { DisplayedConcreteObservation } from '@/types/types';
+import type { DisplayedObservation } from '@/types/types';
 import { computed } from 'vue';
  
 const props = defineProps<{
-  observation: DisplayedConcreteObservation
+  observation: DisplayedObservation
 }>()
 
 const items = computed(() => {
-   var entries = Object.entries(props.observation.measurements).concat(Object.entries(props.observation.symptoms)).map(([key, value]) => ({
+   var entries = Object.entries(props.observation.items).map(([key, value]) => ({
       key,
       value,
    }))

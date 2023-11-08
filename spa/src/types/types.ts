@@ -1,118 +1,76 @@
-export interface Symptom {
-  name: string // Name of the symptom (e.g., "Cough")
-  //description: string; // Description of the symptom
-  severity: 'mild' | 'moderate' | 'severe' // Severity level
-  // Add other properties specific to a symptom if needed
+export interface SavedObservation extends Observation, TimeStamped {
 }
 
-// export interface Observation {
-//   observations: string[]
-//   timestamp: Date
-// }
-
-// export interface ObservationInstance {
-//   measurements: {
-//     collarBoneRetraction: ObservationItem
-//     chestRetraction: ObservationItem
-//   }
-//   symptoms: {
-//     cough: ObservationItem
-//     fever: FeverObservation
-//   }
-// }
-
-// export interface ObservationInfo {
-//   measurements: {
-//     collarBoneRetraction: ObservationItem
-//     chestRetraction: ObservationItem
-//   }
-//   symptoms: {
-//     cough: ObservationItem
-//     fever: FeverObservation
-//   }
-// }
-
-// export interface ObservationInfoItem {
-//   displayName: string
-//   icon: string
-// }
-
-export interface ObservationInfo extends Observation<ObservationInfoItem> {}
-
-export interface ConcreteObservation extends Observation<ConcreteObservationItem> {}
-
-export interface NewConcreteObservation extends ConcreteObservation {}
-
-export interface SavedConcreteObservation extends ConcreteObservation, TimestampedObservation {}
-
-interface TimestampedObservation {
+export interface TimeStamped {
    timestamp: Date
+ }
+
+export interface DisplayedObservation extends ObservationWithInfo, TimeStamped {
+  formattedTimestamp: string,
 }
 
-export interface DisplayedConcreteObservation extends Observation<ConcreteObservationItem & ObservationInfoItem>, TimestampedObservation {
-   formattedTimestamp: string
+export interface ObservationItem {}
+
+export interface Fever extends ObservationItem {
+  temperature: number
 }
 
-export interface ConcreteObservationItem {
-   observed: boolean
+export interface Cough extends ObservationItem {
+  phlegm: boolean
 }
 
-export interface Fever extends ConcreteObservationItem {
-   temperature: number
+export interface Items<T = null> {
+   collarBoneRetraction?: T extends null ? ObservationItem : ObservationItem & T
+   ribRetraction?: T extends null ? ObservationItem : ObservationItem & T
+   chestCongestion?: T extends null ? ObservationItem : ObservationItem & T
+   shortnessOfBreath?: T extends null ? ObservationItem : ObservationItem & T
+   cough?: T extends null ? ObservationItem : ObservationItem & T
+   wheezing?: T extends null ? ObservationItem : ObservationItem & T
+   fatigue?: T extends null ? ObservationItem : ObservationItem & T
+   fever?: T extends null ? Fever : Fever & T
 }
 
-export interface Cough extends ConcreteObservationItem {
-   phlegm: boolean
-}
+export interface Observation extends BaseObservation {
+ }
 
-type ObservationType = ObservationInfoItem | ConcreteObservationItem
-
-export interface Measurements<T extends ObservationType> {
-   collarBoneRetraction: T
-   ribRetraction: T
-}
-
-export interface Symptoms<T extends ObservationType> {
-   chestCongestion: T
-   shortnessOfBreath: T
-   cough: T
-   wheezing: T
-   fatigue: T
-   fever: T extends(ObservationInfoItem) ? T : (Fever & T)
-}
-
-export interface Observation<T extends ObservationType> {
-   measurements: Measurements<T>
-   symptoms: Symptoms<T>
+ interface ObservationWithInfo extends BaseObservation<ObservationInfoItem> {}
+ 
+ interface BaseObservation<T = null> {
+   items: Items<T>
  }
  
-export interface ObservationInfoItem {
-   displayName: string
-   icon: string
+ export interface ObservationInfoItem {
+  displayName: string
+  type: ObservationType
+  icon: string
 }
 
-export function defaultConcreteObservation(): NewConcreteObservation {
-   const defaultObservationItem: ConcreteObservationItem = {
-     observed: false,
-   };
- 
-   const defaultObservation: NewConcreteObservation = {
-     measurements: {
-       collarBoneRetraction: defaultObservationItem,
-       ribRetraction: defaultObservationItem,
-     },
-     symptoms: {
-       chestCongestion: defaultObservationItem,
-       shortnessOfBreath: defaultObservationItem,
-       cough: defaultObservationItem,
-       wheezing: defaultObservationItem,
-       fatigue: defaultObservationItem,
-       fever: {
-         observed: false,
-         temperature: 0,
-       },
-     },
-   };
- 
-   return defaultObservation;
- }
+export type ObservationInfo = Record<keyof Items, ObservationInfoItem>
+
+type ObservationType = 'measurement' | 'symptom'
+
+// export function defaultConcreteObservation(): NewObservation {
+//    const defaultObservationItem: ObservationItem = {
+//      observed: false,
+//    };
+
+//    const defaultObservation: NewObservation = {
+//      measurements: {
+//        collarBoneRetraction: defaultObservationItem,
+//        ribRetraction: defaultObservationItem,
+//      },
+//      symptoms: {
+//        chestCongestion: defaultObservationItem,
+//        shortnessOfBreath: defaultObservationItem,
+//        cough: defaultObservationItem,
+//        wheezing: defaultObservationItem,
+//        fatigue: defaultObservationItem,
+//        fever: {
+//          observed: false,
+//          temperature: 0,
+//        },
+//      },
+//    };
+
+//    return defaultObservation;
+//  }

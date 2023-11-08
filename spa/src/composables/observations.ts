@@ -1,69 +1,74 @@
 import { useObservationsStore } from '@/stores/observations'
-import type { DisplayedConcreteObservation, NewConcreteObservation, ObservationInfo, SavedConcreteObservation } from '@/types/types'
+import type {
+  ObservationInfo,
+  SavedObservation,
+  Observation,
+  DisplayedObservation} from '@/types/types'
 import { computed } from 'vue'
 
 export function useObservations() {
   const observationsStore = useObservationsStore()
 
-  const allObservations = computed<DisplayedConcreteObservation[]>(() =>
-    observationsStore.allObservations.map((observation) => ({
-      ...observation,
-      measurements: {
-         ...observation.measurements,
-         ...observationInfo.value.measurements,
-      },
-      symptoms: {
-         ...observation.symptoms,
-         ...observationInfo.value.symptoms,
-      },
-      formattedTimestamp: observation.timestamp.toLocaleString()
-    }))
-  )
+  const allObservations = computed<DisplayedObservation[]>(() => {
+    return observationsStore.allObservations.map((savedObservation) => {
+      const combined: DisplayedObservation = { items: {}, timestamp: savedObservation.timestamp, formattedTimestamp: savedObservation.timestamp.toLocaleString() }
+      Object.entries(savedObservation.items).forEach(element => {
+         if (element[0] in observationInfo.value) {
+            combined.items = { ...combined.items, ...observationInfo.value[element[0] as keyof ObservationInfo] }
+         }
+      });
+      return combined
+    })
+  })
 
-  function addObservation(observation: NewConcreteObservation) {
-   const newItem: SavedConcreteObservation = {
-     ...observation,
-     timestamp: new Date()
-   }
-   observationsStore.addObservation(newItem)
- }
+  function addObservation(observation: Observation) {
+    const newItem: SavedObservation = {
+      ...observation,
+      timestamp: new Date()
+    }
+    observationsStore.addObservation(newItem)
+  }
 
   const observationInfo = computed<ObservationInfo>(() => ({
-    measurements: {
-      collarBoneRetraction: {
-        displayName: 'Retraction above the collarbone',
-        icon: ''
-      },
-      ribRetraction: {
-        displayName: 'Retraction in the rib area',
-        icon: ''
-      }
+    collarBoneRetraction: {
+      displayName: 'Retraction above the collarbone',
+      type: 'measurement',
+      icon: ''
     },
-    symptoms: {
-      chestCongestion: {
-        displayName: 'Chest Congestion',
-        icon: 'mdi-liquid-spot'
-      },
-      shortnessOfBreath: {
-        displayName: 'Shortness of Breath',
-        icon: 'mdi-lungs'
-      },
-      cough: {
-        displayName: 'Coughing',
-        icon: 'mdi-account-voice'
-      },
-      wheezing: {
-        displayName: 'Wheezing',
-        icon: 'mdi-weather-dust'
-      },
-      fatigue: {
-        displayName: 'Fatigue',
-        icon: 'mdi-eye-closed'
-      },
-      fever: {
-        displayName: 'Fever',
-        icon: 'mdi-emoticon-sick'
-      }
+    ribRetraction: {
+      displayName: 'Retraction in the rib area',
+      type: 'measurement',
+      icon: ''
+    },
+    chestCongestion: {
+      displayName: 'Chest Congestion',
+      type: 'symptom',
+      icon: 'mdi-liquid-spot'
+    },
+    shortnessOfBreath: {
+      displayName: 'Shortness of Breath',
+      type: 'symptom',
+      icon: 'mdi-lungs'
+    },
+    cough: {
+      displayName: 'Coughing',
+      type: 'symptom',
+      icon: 'mdi-account-voice'
+    },
+    wheezing: {
+      displayName: 'Wheezing',
+      type: 'symptom',
+      icon: 'mdi-weather-dust'
+    },
+    fatigue: {
+      displayName: 'Fatigue',
+      type: 'symptom',
+      icon: 'mdi-eye-closed'
+    },
+    fever: {
+      displayName: 'Fever',
+      type: 'symptom',
+      icon: 'mdi-emoticon-sick'
     }
   }))
 
