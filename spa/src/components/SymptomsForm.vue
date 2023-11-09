@@ -63,13 +63,13 @@
 
                       <v-chip-group v-model="observedSymptomKeys" column multiple>
                         <v-chip
-                          v-for="(symptom, name) in possibleSymptoms"
-                          :key="name"
-                          :value="name"
+                          v-for="[key, value] in possibleSymptoms"
+                          :key="key"
+                          :value="key"
                           filter
-                          :append-icon="symptom.icon"
+                          :append-icon="value.icon"
                         >
-                          {{ symptom.displayName }}
+                          {{ value.displayName }}
                         </v-chip>
                       </v-chip-group>
                     </v-card-text>
@@ -79,11 +79,11 @@
                       <h2 class="text-h6 mb-2">Were any retractions observed?</h2>
                     </v-card-text>
                     <v-checkbox
-                      v-for="(retraction, name) in possibleMeasurements"
-                      :key="name"
+                      v-for="[key, value] in possibleMeasurements"
+                      :key="key"
                       v-model="observedMeasurementKeys"
-                      :label="retraction.displayName"
-                      :value="name"
+                      :label="value.displayName"
+                      :value="key"
                     ></v-checkbox>
                   </v-window-item>
                   <v-window-item v-if="showFever" style="height: 500px">
@@ -115,7 +115,7 @@
 </template>
 <script setup lang="ts">
 import { useObservations } from '@/composables/observations'
-import type { Items, Observation } from '@/types/types'
+import type { Items, Observation, ObservationItem } from '@/types/types'
 import { ref, computed } from 'vue'
 
 const emit = defineEmits<{
@@ -125,23 +125,29 @@ const emit = defineEmits<{
 const { observationInfo, addObservation } = useObservations()
 
 const possibleSymptoms = computed(() =>
-  Object.values(observationInfo.value).filter((entry) => entry.type === 'symptom')
+  Object.entries(observationInfo.value).filter((entry) => entry[1].type === 'symptom')
 )
 const possibleMeasurements = computed(() =>
-  Object.values(observationInfo.value).filter((entry) => entry.type === 'measurement')
+  Object.entries(observationInfo.value).filter((entry) => entry[1].type === 'measurement')
 )
 
 const window = ref(0)
 
-const observedSymptomKeys = ref([])
-const observedMeasurementKeys = ref([])
+const observedSymptomKeys = ref<(keyof Items)[]>([])
+const observedMeasurementKeys = ref<(keyof Items)[]>([])
 
 const observation = computed<Observation>(() => {
   const obs: Observation = {
     items: {}
   }
-  observedSymptomKeys.value.concat(observedMeasurementKeys.value).forEach((key) => {
-   obs.items[key as keyof Items] = {temperature: temperature.value}
+  const observedKeys = observedSymptomKeys.value.concat(observedMeasurementKeys.value)
+  observedKeys.forEach((key) => {
+   if (key === 'fever') {
+      obs.items[key] = { temperature: temperature.value }
+   }
+   else {
+      obs.items[key] = {}
+   }
   })
   return obs
 })
@@ -151,7 +157,6 @@ const showFever = computed(() => !!observation.value.items.fever)
 const temperature = ref()
 
 function submit() {
-   console.log(observation.value)
   addObservation(observation.value)
   emit('submit')
 }

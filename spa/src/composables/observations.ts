@@ -3,20 +3,32 @@ import type {
   ObservationInfo,
   SavedObservation,
   Observation,
-  DisplayedObservation} from '@/types/types'
+  DisplayedObservation,
+  ObservationInfoItem,
+  Items
+} from '@/types/types'
 import { computed } from 'vue'
 
 export function useObservations() {
   const observationsStore = useObservationsStore()
 
   const allObservations = computed<DisplayedObservation[]>(() => {
+    console.log(observationsStore.allObservations)
     return observationsStore.allObservations.map((savedObservation) => {
-      const combined: DisplayedObservation = { items: {}, timestamp: savedObservation.timestamp, formattedTimestamp: savedObservation.timestamp.toLocaleString() }
-      Object.entries(savedObservation.items).forEach(element => {
-         if (element[0] in observationInfo.value) {
-            combined.items = { ...combined.items, ...observationInfo.value[element[0] as keyof ObservationInfo] }
-         }
-      });
+      const combined: DisplayedObservation = {
+        items: {},
+        timestamp: savedObservation.timestamp,
+        formattedTimestamp: savedObservation.timestamp.toLocaleString()
+      }
+      Object.entries(savedObservation.items).forEach((element) => {
+        const key = element[0] as keyof Items<ObservationInfoItem>
+        if (key in observationInfo.value) {
+          const combinedItem = {
+            [key]: { ...observationInfo.value[element[0] as keyof ObservationInfo], ...element[1] }
+          }
+          combined.items = { ...combined.items, ...combinedItem }
+        }
+      })
       return combined
     })
   })
