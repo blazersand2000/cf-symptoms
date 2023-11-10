@@ -1,18 +1,15 @@
 <template>
-  <div>
-    <h1>Welcome to CF Symptoms</h1>
-  </div>
-  <div id="firebaseui-auth-container"></div>
-  <div>
-    <v-btn v-if="isLoggedIn" color="info" @click="handleLogOut">Log out</v-btn>
-  </div>
-  <div id="loader">Loading...</div>
+  <v-card width="400" title="Welcome to CF Symptoms Tracker" subtitle="Login to track your data">
+    <div id="firebaseui-auth-container"></div>
+    <div id="loader">Loading...</div>
+  </v-card>
 </template>
 <script setup lang="ts">
+import { useAuth } from '@/composables/auth'
 import firebase from 'firebase/compat/app'
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
-import { ref } from 'vue'
+import { onMounted } from 'vue'
 
 const uiConfig = {
   callbacks: {
@@ -23,7 +20,6 @@ const uiConfig = {
 
       console.log('AAAA')
       console.log(authResult)
-      isLoggedIn.value = true
 
       //don't refresh page
       return false
@@ -52,26 +48,10 @@ const uiConfig = {
   privacyPolicyUrl: '<your-privacy-policy-url>'
 }
 
-// Initialize the FirebaseUI Widget using Firebase.
-const ui = new firebaseui.auth.AuthUI(firebase.auth())
-ui.start('#firebaseui-auth-container', uiConfig)
+onMounted(() => {
+  const { firebaseUi } = useAuth()
 
-const isLoggedIn = ref(false)
-
-function handleLogOut() {
-  firebase
-    .auth()
-    .signOut()
-    .then(() => {
-      // Sign-out successful.
-      isLoggedIn.value = false
-      ui.start('#firebaseui-auth-container', uiConfig)
-
-    })
-    .catch((error) => {
-      // An error happened.
-      console.log(error)
-    })
-}
+  firebaseUi.value.start('#firebaseui-auth-container', uiConfig)
+})
 </script>
 <style></style>
