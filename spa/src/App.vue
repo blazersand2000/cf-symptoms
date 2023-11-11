@@ -1,8 +1,8 @@
 <template>
   <v-app class="rounded rounded-md">
     <v-app-bar title="CF Symptoms Tracker">
-      <template v-slot:append>
-        <div class="text-subtitle-1">{{ displayedUser }}</div>
+      <template v-slot:append v-if="!showLogin">
+        <div class="text-subtitle-1">{{ userGreeting }}</div>
         <v-menu>
           <template v-slot:activator="{ props }">
             <v-btn v-bind="props" icon="mdi-dots-vertical"></v-btn>
@@ -29,31 +29,27 @@
     <!-- <v-main class="d-flex align-center justify-center" style="min-height: 300px;"> -->
 
     <v-main class="d-flex justify-center" style="min-height: 300px">
-      <RouterView />
+      <LoginView v-if="showLogin" />
+      <RouterView v-else />
     </v-main>
   </v-app>
-
-  <v-dialog v-model="showLogin" fullscreen :scrim="false" transition="dialog-bottom-transition">
-    <template v-slot:activator="{ props }">
-      <v-btn color="primary" dark v-bind="props">Add Observation</v-btn>
-    </template>
-    <v-card>
-      <Login />
-    </v-card>
-  </v-dialog>
 </template>
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { computed, ref } from 'vue'
 import { useAuth } from '@/composables/auth'
-import Login from './components/Login.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const { loggedInUser, logout } = useAuth()
 
 const showLogin = computed(() => !loggedInUser.value)
 
-const displayedUser = computed(() =>
-  loggedInUser.value ? `Hello, ${loggedInUser.value.email}` : ''
-)
+const userGreeting = computed(() => {
+  if (!loggedInUser.value) {
+    return ''
+  }
+  const displayedUser = loggedInUser.value.displayName ?? loggedInUser.value.email
+  return `Hello, ${displayedUser}`
+})
 </script>
 <style scoped></style>

@@ -1,13 +1,19 @@
 <template>
-  <v-card width="400" title="Welcome to CF Symptoms Tracker" subtitle="Login to track your data">
+   <div class="container">
+        <v-card
+    class="auto text-center"
+    title="Welcome to CF Symptoms Tracker"
+    subtitle="Login to track your data"
+  >
     <div id="firebaseui-auth-container"></div>
     <div id="loader">Loading...</div>
   </v-card>
+
+   </div>
 </template>
 <script setup lang="ts">
 import { useAuth } from '@/composables/auth'
 import firebase from 'firebase/compat/app'
-import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 import { onMounted } from 'vue'
 
@@ -17,9 +23,6 @@ const uiConfig = {
       // User successfully signed in.
       // Return type determines whether we continue the redirect automatically
       // or whether we leave that to developer to handle.
-
-      console.log('AAAA')
-      console.log(authResult)
 
       //don't refresh page
       return false
@@ -54,4 +57,11 @@ onMounted(() => {
   firebaseUi.value.start('#firebaseui-auth-container', uiConfig)
 })
 </script>
-<style></style>
+<style scoped>
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* height: 100vh; */
+}
+</style>

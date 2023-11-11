@@ -3,38 +3,38 @@ import * as firebaseui from 'firebaseui'
 import { computed, ref } from 'vue'
 
 export function useAuth() {
-  // Initialize the FirebaseUI Widget using Firebase.
-  const firebaseUi = computed(
-    () => firebaseui.auth.AuthUI.getInstance() ?? new firebaseui.auth.AuthUI(firebase.auth())
-  )
+  // References
+  const loggedInUserRef = ref<firebase.User | null>(null)
 
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/v8/firebase.User
-      // ...
-    } else {
-      // User is signed out
-      // ...
-    }
-    loggedInUserRef.value = user
-  })
-
-  const loggedInUserRef = ref<firebase.User | null>()
+  // Computed properties
+  const firebaseUi = computed(() => firebaseui.auth.AuthUI.getInstance() ?? new firebaseui.auth.AuthUI(firebase.auth()))
   const loggedInUser = computed(() => loggedInUserRef.value)
 
-  function logout() {
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        // Sign-out successful.
-      })
-      .catch((error) => {
-        // An error happened.
-        console.log(error)
-      })
+  // Functions
+  const logout = async () => {
+    try {
+      await firebase.auth().signOut()
+    } catch (error) {
+      console.error(error)
+    }
   }
 
+  // Event listeners
+  firebase.auth().onAuthStateChanged((user) => {
+    loggedInUserRef.value = user
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user))
+    } else {
+      localStorage.removeItem('user')
+    }
+  })
+
+  // Initialization
+  const storedUser = localStorage.getItem('user')
+  if (storedUser) {
+    loggedInUserRef.value = JSON.parse(storedUser)
+  }
+
+  // Exposed API
   return { firebaseUi, loggedInUser, logout }
 }
