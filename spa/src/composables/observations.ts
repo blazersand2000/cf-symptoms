@@ -8,29 +8,16 @@ import type {
   Items
 } from '@/types/types'
 import { computed } from 'vue'
+import { useDatabase } from './database'
 
 export function useObservations() {
-  const observationsStore = useObservationsStore()
+  const { getObservations, addObservation: addObservationToDb } = useDatabase()
 
   const allObservations = computed<DisplayedObservation[]>(() => {
-    console.log(observationsStore.allObservations)
-    return observationsStore.allObservations.map((savedObservation) => {
-      const combined: DisplayedObservation = {
-        items: {},
-        timestamp: savedObservation.timestamp,
-        formattedTimestamp: savedObservation.timestamp.toLocaleString()
-      }
-      Object.entries(savedObservation.items).forEach((element) => {
-        const key = element[0] as keyof Items<ObservationInfoItem>
-        if (key in observationInfo.value) {
-          const combinedItem = {
-            [key]: { ...observationInfo.value[element[0] as keyof ObservationInfo], ...element[1] }
-          }
-          combined.items = { ...combined.items, ...combinedItem }
-        }
-      })
-      return combined
-    })
+    const savedObservations = getObservations.value
+    return savedObservations.map((savedObservation) =>
+      convertFromSavedToDisplayedObservations(savedObservation, observationInfo.value)
+    )
   })
 
   function addObservation(observation: Observation) {
@@ -38,7 +25,7 @@ export function useObservations() {
       ...observation,
       timestamp: new Date()
     }
-    observationsStore.addObservation(newItem)
+    addObservationToDb(newItem)
   }
 
   const observationInfo = computed<ObservationInfo>(() => ({
@@ -85,4 +72,25 @@ export function useObservations() {
   }))
 
   return { allObservations, observationInfo, addObservation }
+}
+
+function convertFromSavedToDisplayedObservations(
+  savedObservation: SavedObservation,
+  observationInfo: ObservationInfo
+) {
+  const combined: DisplayedObservation = {
+    items: {},
+    timestamp: savedObservation.timestamp,
+    formattedTimestamp: savedObservation.timestamp.toLocaleString()
+  }
+  Object.entries(savedObservation.items).forEach((element) => {
+    const key = element[0] as keyof Items<ObservationInfoItem>
+    if (key in observationInfo) {
+      const combinedItem = {
+        [key]: { ...observationInfo[element[0] as keyof ObservationInfo], ...element[1] }
+      }
+      combined.items = { ...combined.items, ...combinedItem }
+    }
+  })
+  return combined
 }
