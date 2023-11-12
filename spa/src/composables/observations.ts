@@ -1,4 +1,4 @@
-import { useObservationsStore } from "@/stores/observations";
+import { useObservationsStore } from "@/stores/observations"
 import type {
    ObservationInfo,
    SavedObservation,
@@ -6,111 +6,111 @@ import type {
    DisplayedObservation,
    ObservationInfoItem,
    Items,
-} from "@/types/types";
-import { computed } from "vue";
-import { useDatabase } from "./database";
+} from "@/types/types"
+import { computed } from "vue"
+import { useDatabase } from "./database"
 
 export function useObservations() {
-   const {
-      loading,
-      observations,
-      addObservation: addObservationToDb,
-   } = useDatabase();
+   const { loading, observations, addObservation: addObservationToDb } = useDatabase()
 
    const allObservations = computed<DisplayedObservation[]>(() => {
-      const savedObservations = observations.value;
+      const savedObservations = observations.value
       return savedObservations.map((savedObservation) =>
-         convertFromSavedToDisplayedObservations(
-            savedObservation,
-            observationInfo.value
-         )
-      );
-   });
+         convertFromSavedToDisplayedObservations(savedObservation, observationInfo.value)
+      )
+   })
 
    function addObservation(observation: Observation) {
       const newItem: SavedObservation = {
          ...observation,
          timestamp: new Date(),
-      };
-      addObservationToDb(newItem);
+      }
+      addObservationToDb(newItem)
    }
 
-   const observationInfo = computed<ObservationInfo>(
-      () => globalObservationInfo
-   );
+   const observationInfo = computed<ObservationInfo>(() => globalObservationInfo)
 
    return {
       isLoading: loading,
       allObservations,
       observationInfo,
       addObservation,
-   };
+   }
 }
 
 const globalObservationInfo: ObservationInfo = {
    collarBoneRetraction: {
       displayName: "Retraction above the collarbone",
-      type: "measurement",
-      icon: "",
+      type: "respiratory",
+      icon: "mdi-account-arrow-left",
    },
    ribRetraction: {
       displayName: "Retraction in the rib area",
-      type: "measurement",
-      icon: "",
-   },
-   chestCongestion: {
-      displayName: "Chest Congestion",
-      type: "symptom",
-      icon: "mdi-liquid-spot",
-   },
-   shortnessOfBreath: {
-      displayName: "Shortness of Breath",
-      type: "symptom",
-      icon: "mdi-lungs",
+      type: "respiratory",
+      icon: "mdi-account-arrow-left",
    },
    cough: {
       displayName: "Coughing",
-      type: "symptom",
+      type: "respiratory",
       icon: "mdi-account-voice",
    },
-   wheezing: {
-      displayName: "Wheezing",
-      type: "symptom",
-      icon: "mdi-weather-dust",
+   aspiration: {
+      displayName: "Aspiration",
+      type: "respiratory",
+      icon: "mdi-lungs",
    },
-   fatigue: {
-      displayName: "Fatigue",
-      type: "symptom",
-      icon: "mdi-eye-closed",
+   mouthBreathing: {
+      displayName: "Mouth breathing",
+      type: "respiratory",
+      icon: "mdi-emoticon-frown",
    },
-   fever: {
-      displayName: "Fever",
-      type: "symptom",
-      icon: "mdi-emoticon-sick",
+   abnormalStool: {
+      displayName: "Abnormal stools",
+      type: "pancreatic",
+      icon: "mdi-emoticon-poop",
    },
-};
+   constipation: {
+      displayName: "Constipation",
+      type: "pancreatic",
+      icon: "mdi-filter-remove-outline",
+   },
+   diaperRash: {
+      displayName: "Diaper rash",
+      type: "pancreatic",
+      icon: "mdi-human-baby-changing-table",
+   },
+   bloating: {
+      displayName: "Bloating",
+      type: "pancreatic",
+      icon: "mdi-human-pregnant",
+   },
+   tummyPain: {
+      displayName: "Tummy pain",
+      type: "pancreatic",
+      icon: "mdi-account-alert",
+   },
+}
 
 function convertFromSavedToDisplayedObservations(
    savedObservation: SavedObservation,
    observationInfo: ObservationInfo
 ) {
-   console.log(savedObservation);
    const combined: DisplayedObservation = {
       items: {},
       timestamp: savedObservation.timestamp,
       formattedTimestamp: savedObservation.timestamp.toLocaleString(),
-   };
+   }
    Object.entries(savedObservation.items).forEach((element) => {
-      const key = element[0] as keyof Items<ObservationInfoItem>;
+      const key = element[0] as keyof Items<ObservationInfoItem>
       if (key in observationInfo) {
          const combinedItem = {
             [key]: {
                ...observationInfo[element[0] as keyof ObservationInfo],
                ...element[1],
             },
-         };
-         combined.items = { ...combined.items, ...combinedItem };
+         }
+         combined.items = { ...combined.items, ...combinedItem }
       }
-   });
-   return combined;
+   })
+   return combined
 }

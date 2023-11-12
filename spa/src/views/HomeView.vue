@@ -9,9 +9,7 @@
                transition="dialog-bottom-transition"
             >
                <template v-slot:activator="{ props }">
-                  <v-btn color="primary" dark v-bind="props"
-                     >Add Observation</v-btn
-                  >
+                  <v-btn color="primary" dark v-bind="props">Add Observation</v-btn>
                </template>
                <v-card>
                   <v-toolbar dark color="primary">
@@ -29,36 +27,29 @@
             </v-dialog>
          </v-col>
       </v-row>
-      <div>
-         {{ isLoading }}
-      </div>
       <v-row v-if="isLoading">
          <Loading />
       </v-row>
       <v-row justify="center">
-         <v-col
-            cols="12"
-            class="d-flex justify-center"
-            v-for="observation in allObservations"
-         >
+         <v-col cols="12" class="d-flex justify-center" v-for="observation in allObservations">
             <ObservationCard :observation="observation" />
          </v-col>
       </v-row>
    </v-container>
 </template>
 <script setup lang="ts">
-import SymptomsForm from "@/components/SymptomsForm.vue";
-import { computed, ref } from "vue";
-import { useObservations } from "@/composables/observations";
-import ObservationCard from "@/components/ObservationCard.vue";
-import Loading from "@/components/Loading.vue";
+import SymptomsForm from "@/components/SymptomsForm.vue"
+import { computed, ref } from "vue"
+import { useObservations } from "@/composables/observations"
+import ObservationCard from "@/components/ObservationCard.vue"
+import Loading from "@/components/Loading.vue"
 
-const { isLoading, allObservations } = useObservations();
+const { isLoading, allObservations } = useObservations()
 
-const dialog = ref(false);
+const dialog = ref(false)
 
 function handleSubmit() {
-   dialog.value = false;
+   dialog.value = false
 }
 
 // const showFever = computed(() =>
