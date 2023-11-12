@@ -1,6 +1,15 @@
-import { getFirestore, collection, doc, onSnapshot, addDoc } from "firebase/firestore";
-import { ref, computed } from 'vue';
-import { useAuth } from './auth'; // replace with your auth composable path
+import {
+   getFirestore,
+   collection,
+   doc,
+   onSnapshot,
+   addDoc,
+   type Unsubscribe,
+   query,
+   orderBy,
+} from "firebase/firestore";
+import { ref, computed, watch } from "vue";
+import { useAuth } from "./auth"; // replace with your auth composable path
 import type { SavedObservation } from "@/types/types";
 import type { FirebaseError } from "firebase/app";
 
@@ -12,24 +21,54 @@ export function useDatabase() {
    const db = getFirestore();
    const { loggedInUser } = useAuth(); // get the currently logged in user
    const error = ref();
-   const observations = ref<SavedObservation[]>([]);
+   const observationsRef = ref<SavedObservation[]>([]);
+   const loadingRef = ref(true);
+   const unsubscribe = ref<Unsubscribe>();
 
    function handleError(err: FirebaseError) {
       error.value = err.message;
-    }
+   }
 
-   const getObservations = computed(() => {
+   watch(loggedInUser, (value, prev) => {
+      if (unsubscribe.value) {
+         unsubscribe.value();
+      }
+      if (!value) {
+         return;
+      }
+
+      loadingRef.value = true;
+      const userDoc = doc(db, "users", value.uid);
+      const obsCollection = collection(userDoc, "observations");
+      const q = query(obsCollection, orderBy("timestamp", "desc"));
+
+      unsubscribe.value = onSnapshot(
+         q,
+         (snapshot) => {
+            observationsRef.value = snapshot.docs.map((doc) => {
+               const data = doc.data();
+               // Firebase stores Date type as Timestamp, so convert it back to Date
+               if (data.timestamp) {
+                  data.timestamp = data.timestamp.toDate();
+               }
+               return data as SavedObservation;
+            });
+            loadingRef.value = false;
+         },
+         handleError
+      );
+   });
+
+   const loading = computed(() => {
+      return loadingRef.value;
+   });
+
+   const observations = computed(() => {
       if (!loggedInUser.value) {
          return [];
       }
-      const userDoc = doc(db, 'users', loggedInUser.value.uid);
-      const obsCollection = collection(userDoc, 'observations');
 
-      onSnapshot(obsCollection, (snapshot) => {
-         observations.value = snapshot.docs.map(doc => doc.data() as SavedObservation);
-      }, handleError);
-
-      return observations.value;
+      return observationsRef.value;
    });
 
    async function addObservation(observation: SavedObservation) {
@@ -38,8 +77,8 @@ export function useDatabase() {
       }
 
       try {
-         const userDoc = doc(db, 'users', loggedInUser.value.uid);
-         await addDoc(collection(userDoc, 'observations'), observation);
+         const userDoc = doc(db, "users", loggedInUser.value.uid);
+         await addDoc(collection(userDoc, "observations"), observation);
       } catch (err) {
          handleError(err as FirebaseError);
       }
@@ -47,5 +86,5 @@ export function useDatabase() {
       return { error };
    }
 
-   return { getObservations, addObservation, error };
+   return { loading, observations, addObservation, error };
 }
