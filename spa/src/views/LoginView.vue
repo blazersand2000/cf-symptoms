@@ -6,30 +6,30 @@
          subtitle="Login to track your data"
       >
          <div id="firebaseui-auth-container"></div>
-         <div id="loader">Loading...</div>
+         <!-- <div id="loader">Loading...</div> -->
       </v-card>
    </div>
 </template>
 <script setup lang="ts">
-import { useAuth } from "@/composables/auth";
-import firebase from "firebase/compat/app";
-import "firebaseui/dist/firebaseui.css";
-import { onMounted } from "vue";
+import { useAuth } from "@/composables/auth"
+import firebase from "firebase/compat/app"
+import "firebaseui/dist/firebaseui.css"
+import { onMounted } from "vue"
 
 const uiConfig = {
    callbacks: {
-      signInSuccessWithAuthResult: function (authResult, redirectUrl) {
+      signInSuccessWithAuthResult: function (authResult: any, redirectUrl: any) {
          // User successfully signed in.
          // Return type determines whether we continue the redirect automatically
          // or whether we leave that to developer to handle.
 
          //don't refresh page
-         return false;
+         return false
       },
       uiShown: function () {
          // The widget is rendered.
          // Hide the loader.
-         document.getElementById("loader").style.display = "none";
+         // document.getElementById("loader").style.display = "none";
       },
    },
    // Will use popup for IDP Providers sign-in flow instead of the default, redirect.
@@ -48,13 +48,13 @@ const uiConfig = {
    tosUrl: "<your-tos-url>",
    // Privacy policy url.
    privacyPolicyUrl: "<your-privacy-policy-url>",
-};
+}
 
 onMounted(() => {
-   const { firebaseUi } = useAuth();
+   const { firebaseUi } = useAuth()
 
-   firebaseUi.value.start("#firebaseui-auth-container", uiConfig);
-});
+   firebaseUi.value.start("#firebaseui-auth-container", uiConfig)
+})
 </script>
 <style scoped>
 .container {

@@ -1,6 +1,6 @@
 <template>
    <v-app class="rounded rounded-md">
-      <v-app-bar title="CF Symptoms Tracker">
+      <v-app-bar title="CF Tracker">
          <template v-slot:append v-if="!showLogin">
             <div class="text-subtitle-1">{{ userGreeting }}</div>
             <v-menu>
@@ -9,9 +9,7 @@
                </template>
                <v-list>
                   <v-list-item value="sdf">
-                     <v-list-item-title @click="logout"
-                        >Logout</v-list-item-title
-                     >
+                     <v-list-item-title @click="logout">Logout</v-list-item-title>
                   </v-list-item>
                </v-list>
             </v-menu>
@@ -37,22 +35,21 @@
    </v-app>
 </template>
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-import { computed, ref } from "vue";
-import { useAuth } from "@/composables/auth";
-import LoginView from "@/views/LoginView.vue";
+import { RouterLink, RouterView } from "vue-router"
+import { computed, ref } from "vue"
+import { useAuth } from "@/composables/auth"
+import LoginView from "@/views/LoginView.vue"
 
-const { loggedInUser, logout } = useAuth();
+const { loggedInUser, logout } = useAuth()
 
-const showLogin = computed(() => !loggedInUser.value);
+const showLogin = computed(() => !loggedInUser.value)
 
 const userGreeting = computed(() => {
    if (!loggedInUser.value) {
-      return "";
+      return ""
    }
-   const displayedUser =
-      loggedInUser.value.displayName ?? loggedInUser.value.email;
-   return `Hello, ${displayedUser}`;
-});
+   const displayedUser = loggedInUser.value.displayName ?? loggedInUser.value.email
+   return `Hello, ${displayedUser}`
+})
 </script>
 <style scoped></style>

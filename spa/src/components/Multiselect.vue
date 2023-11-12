@@ -14,19 +14,11 @@
 <script setup lang="ts">
 import { computed } from "vue"
 
-const props = defineProps({
-   modelValue: {
-      type: Array,
-      default: () => [],
-   },
-   title: String,
-   items: {
-      type: Array,
-      required: true,
-      validator: (items: { key: string; value: string }[]) =>
-         items.every((item) => item.key && item.value),
-   },
-})
+const props = defineProps<{
+   modelValue: { key: string; value: string }[]
+   title: string
+   items: { key: string; value: string }[]
+}>()
 
 const emit = defineEmits(["update:modelValue"])
 
