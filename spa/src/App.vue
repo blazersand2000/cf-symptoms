@@ -32,6 +32,7 @@
          <LoginView v-if="showLogin" />
          <RouterView v-else />
       </v-main>
+      <Alert />
    </v-app>
 </template>
 <script setup lang="ts">
@@ -39,6 +40,7 @@ import { RouterLink, RouterView } from "vue-router"
 import { computed, ref } from "vue"
 import { useAuth } from "@/composables/auth"
 import LoginView from "@/views/LoginView.vue"
+import Alert from "./components/Alert.vue"
 
 const { loggedInUser, logout } = useAuth()
 

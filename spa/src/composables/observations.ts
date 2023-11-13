@@ -9,9 +9,11 @@ import type {
 } from "@/types/types"
 import { computed } from "vue"
 import { useDatabase } from "./database"
+import { useErrorsStore } from "@/stores/errors"
 
 export function useObservations() {
-   const { loading, observations, addObservation: addObservationToDb } = useDatabase()
+   const { logError } = useErrorsStore()
+   const { loading, observations, addObservation: addObservationToDb } = useDatabase(logError)
 
    const allObservations = computed<DisplayedObservation[]>(() => {
       const savedObservations = observations.value

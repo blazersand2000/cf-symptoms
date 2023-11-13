@@ -18,16 +18,17 @@ interface User {
    // Define your user properties here
 }
 
-export function useDatabase() {
+export function useDatabase(onError: ((error: string) => void) | null = null) {
    const db = getFirestore()
    const { loggedInUser } = useAuth() // get the currently logged in user
-   const error = ref()
    const observationsRef = ref<SavedObservation[]>([])
    const loadingRef = ref(true)
    const unsubscribe = ref<Unsubscribe>()
 
    function handleError(err: FirebaseError) {
-      error.value = err.message
+      if (onError) {
+         onError(err.message)
+      }
    }
 
    watch(loggedInUser, (value, prev) => {
@@ -82,9 +83,7 @@ export function useDatabase() {
       } catch (err) {
          handleError(err as FirebaseError)
       }
-
-      return { error }
    }
 
-   return { loading, observations, addObservation, error }
+   return { loading, observations, addObservation }
 }
