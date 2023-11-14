@@ -107,6 +107,18 @@
                               </v-card-text>
                            </v-window-item>
                            <v-window-item style="height: 500px">
+                              <v-card-text class="pa-0">
+                                 <h2 class="text-h6 mb-2">Indicate all medications taken today</h2>
+                                 <v-checkbox
+                                    v-for="value in possibleMedications"
+                                    :key="value"
+                                    :label="value"
+                                    :value="value"
+                                    v-model="takenMedications"
+                                 ></v-checkbox>
+                              </v-card-text>
+                           </v-window-item>
+                           <v-window-item style="height: 500px">
                               <div class="d-flex align-center justify-center" style="height: 100%">
                                  <v-btn color="success" @click="submit">Submit Symptoms</v-btn>
                               </div>

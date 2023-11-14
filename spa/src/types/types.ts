@@ -22,6 +22,14 @@ export interface AbnormalStool extends ObservationItem {
    type: AbnormalStoolTypes
 }
 
+export interface SelectableTimesOfDay extends ObservationItem {
+   timesTaken: (typeof medicationTimes)[number][]
+}
+
+const medicationTimes = ["AM", "PM"] as const
+
+type Enzymes = Record<"Breakfast" | "Lunch" | "Dinner" | "Snack", number>
+
 export interface Items<T = null> {
    collarBoneRetraction?: T extends null ? ObservationItem : ObservationItem & T
    ribRetraction?: T extends null ? ObservationItem : ObservationItem & T
@@ -33,6 +41,11 @@ export interface Items<T = null> {
    diaperRash?: T extends null ? ObservationItem : ObservationItem & T
    bloating?: T extends null ? ObservationItem : ObservationItem & T
    tummyPain?: T extends null ? ObservationItem : ObservationItem & T
+   trikafta?: T extends null ? SelectableTimesOfDay : SelectableTimesOfDay & T
+   vitaminD?: T extends null ? ObservationItem : ObservationItem & T
+   salt?: T extends null ? ObservationItem : ObservationItem & T
+   dekas?: T extends null ? ObservationItem : ObservationItem & T
+   enzymes?: T extends null ? Enzymes : Enzymes & T
 }
 
 export interface Observation extends BaseObservation {}
@@ -52,29 +65,3 @@ export interface ObservationInfoItem {
 export type ObservationInfo = Record<keyof Items, ObservationInfoItem>
 
 type ObservationType = "respiratory" | "pancreatic"
-
-// export function defaultConcreteObservation(): NewObservation {
-//    const defaultObservationItem: ObservationItem = {
-//      observed: false,
-//    };
-
-//    const defaultObservation: NewObservation = {
-//      measurements: {
-//        collarBoneRetraction: defaultObservationItem,
-//        ribRetraction: defaultObservationItem,
-//      },
-//      symptoms: {
-//        chestCongestion: defaultObservationItem,
-//        shortnessOfBreath: defaultObservationItem,
-//        cough: defaultObservationItem,
-//        wheezing: defaultObservationItem,
-//        fatigue: defaultObservationItem,
-//        fever: {
-//          observed: false,
-//          temperature: 0,
-//        },
-//      },
-//    };
-
-//    return defaultObservation;
-//  }
