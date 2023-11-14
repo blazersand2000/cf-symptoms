@@ -24,6 +24,26 @@
                         <v-col cols="8" class="pa-0">
                            <v-window-item style="height: 500px">
                               <v-card-text class="pa-0">
+                                 <h2 class="text-h6 mb-2">Snack</h2>
+                                 <v-row>
+                                    <v-btn class="mb-5" color="primary" @click="addSnack"
+                                       >Add Snack</v-btn
+                                    >
+                                 </v-row>
+                                 <div style="overflow-y: auto; max-height: 500px">
+                                    <div v-for="(image, index) in images" :key="index">
+                                       <v-img
+                                          class="ma-2 border rounded"
+                                          :src="image"
+                                          alt="snackity snack snack"
+                                          width="40%"
+                                       />
+                                    </div>
+                                 </div>
+                              </v-card-text>
+                           </v-window-item>
+                           <v-window-item style="height: 500px">
+                              <v-card-text class="pa-0">
                                  <h2 class="text-h6 mb-2">
                                     Choose all respiratory symptoms observed today
                                  </h2>
@@ -153,6 +173,11 @@ const abnormalStool = ref<AbnormalStoolTypes>()
 function submit() {
    addObservation(observation.value)
    emit("submit")
+}
+
+const images = ref<string[]>([])
+function addSnack() {
+   images.value.push("/snack.png")
 }
 </script>
 <style scoped></style>
