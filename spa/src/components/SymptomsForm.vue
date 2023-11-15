@@ -22,7 +22,7 @@
                      <v-row>
                         <v-col cols="2"> </v-col>
                         <v-col cols="8" class="pa-0">
-                           <v-window-item style="height: 500px">
+                           <!-- <v-window-item style="height: 500px">
                               <v-card-text class="pa-0">
                                  <h2 class="text-h6 mb-2">Snack</h2>
                                  <v-row>
@@ -41,7 +41,7 @@
                                     </div>
                                  </div>
                               </v-card-text>
-                           </v-window-item>
+                           </v-window-item> -->
                            <v-window-item style="height: 500px">
                               <v-card-text class="pa-0">
                                  <h2 class="text-h6 mb-2">
@@ -110,12 +110,72 @@
                               <v-card-text class="pa-0">
                                  <h2 class="text-h6 mb-2">Indicate all medications taken today</h2>
                                  <v-checkbox
-                                    v-for="value in possibleMedications"
-                                    :key="value"
-                                    :label="value"
-                                    :value="value"
-                                    v-model="takenMedications"
+                                    v-for="[key, value] in possibleMedications"
+                                    :key="key"
+                                    :label="value.displayName"
+                                    :value="key"
+                                    v-model="takenMedicationKeys"
                                  ></v-checkbox>
+                              </v-card-text>
+                           </v-window-item>
+                           <v-window-item style="height: 500px" v-if="showTrikafta">
+                              <v-card-text class="pa-0">
+                                 <h2 class="text-h6 mb-2">
+                                    Choose all times Trikafta was taken today
+                                 </h2>
+                                 <v-checkbox
+                                    v-for="time in possibleMedicationTimes"
+                                    :key="time"
+                                    :label="time"
+                                    :value="time"
+                                    v-model="trikaftaTimes"
+                                 ></v-checkbox>
+                              </v-card-text>
+                           </v-window-item>
+                           <v-window-item style="height: 500px">
+                              <v-card-text class="pa-0">
+                                 <h2 class="text-h6 mb-2">Indicate enzymes taken today</h2>
+                                 <div>
+                                    <div v-for="(value, meal) in enzymes" :key="meal">
+                                       <div v-if="meal !== 'Snack'">
+                                          <v-checkbox
+                                             v-model="value.withEnzymes"
+                                             @change="
+                                                value.withoutEnzymes = value.withEnzymes ? 0 : 1
+                                             "
+                                             :label="meal"
+                                             :true-value="1"
+                                             :false-value="0"
+                                          ></v-checkbox>
+                                       </div>
+                                       <div v-else>
+                                          <v-text-field
+                                             v-model.number="value.withEnzymes"
+                                             type="number"
+                                             :rules="numberRules"
+                                          >
+                                             <template v-slot:label>
+                                                <div>
+                                                   {{ meal }} - number eaten
+                                                   <strong>with</strong> enzymes
+                                                </div>
+                                             </template>
+                                          </v-text-field>
+                                          <v-text-field
+                                             v-model.number="value.withoutEnzymes"
+                                             type="number"
+                                             :rules="numberRules"
+                                          >
+                                             <template v-slot:label>
+                                                <div>
+                                                   {{ meal }} - number eaten
+                                                   <strong>without</strong> enzymes
+                                                </div>
+                                             </template></v-text-field
+                                          >
+                                       </div>
+                                    </div>
+                                 </div>
                               </v-card-text>
                            </v-window-item>
                            <v-window-item style="height: 500px">
@@ -131,12 +191,22 @@
             </v-card>
          </v-col>
       </v-row>
+      <!-- Uncomment below to debug the observation value -->
+      <!-- <v-card>
+         <pre>{{ prettyJson }}</pre>
+      </v-card> -->
    </v-container>
-   <!-- <v-btn @click="click">Submit Symptoms</v-btn> -->
 </template>
 <script setup lang="ts">
 import { useObservations } from "@/composables/observations"
-import type { AbnormalStoolTypes, CoughTypes, Items, Observation } from "@/types/types"
+import {
+   medicationTimes,
+   type AbnormalStoolTypes,
+   type CoughTypes,
+   type Items,
+   type Observation,
+   type Enzymes,
+} from "@/types/types"
 import { ref, computed } from "vue"
 
 const emit = defineEmits<{
@@ -151,22 +221,51 @@ const possibleRespiratory = computed(() =>
 const possiblePancreatic = computed(() =>
    Object.entries(observationInfo.value).filter((entry) => entry[1].type === "pancreatic")
 )
+const possibleMedications = computed(() =>
+   Object.entries(observationInfo.value).filter((entry) => entry[1].type === "medication")
+)
 
 const window = ref(0)
 
 const observedRespiratoryKeys = ref<(keyof Items)[]>([])
 const observedPancreaticKeys = ref<(keyof Items)[]>([])
+const takenMedicationKeys = ref<(keyof Items)[]>([])
+const takenEnzymeKeys: (keyof Items)[] = ["enzymes"]
 
 const observation = computed<Observation>(() => {
    const obs: Observation = {
       items: {},
    }
-   const observedKeys = observedRespiratoryKeys.value.concat(observedPancreaticKeys.value)
+   const observedKeys = observedRespiratoryKeys.value
+      .concat(observedPancreaticKeys.value)
+      .concat(takenMedicationKeys.value)
+      .concat(takenEnzymeKeys)
    observedKeys.forEach((key) => {
       if (key === "cough") {
          obs.items[key] = { type: cough.value ?? "dry" }
       } else if (key === "abnormalStool") {
          obs.items[key] = { type: abnormalStool.value ?? "hard" }
+      } else if (key === "trikafta") {
+         obs.items[key] = { timesTaken: trikaftaTimes.value }
+      } else if (key === "enzymes") {
+         obs.items[key] = {
+            Breakfast: {
+               withEnzymes: enzymes.value?.Breakfast.withEnzymes ?? 0,
+               withoutEnzymes: enzymes.value?.Breakfast.withoutEnzymes ?? 0,
+            },
+            Lunch: {
+               withEnzymes: enzymes.value?.Lunch.withEnzymes ?? 0,
+               withoutEnzymes: enzymes.value?.Lunch.withoutEnzymes ?? 0,
+            },
+            Dinner: {
+               withEnzymes: enzymes.value?.Dinner.withEnzymes ?? 0,
+               withoutEnzymes: enzymes.value?.Dinner.withoutEnzymes ?? 0,
+            },
+            Snack: {
+               withEnzymes: enzymes.value?.Snack.withEnzymes ?? 0,
+               withoutEnzymes: enzymes.value?.Snack.withoutEnzymes ?? 0,
+            },
+         }
       } else {
          obs.items[key] = {}
       }
@@ -176,11 +275,28 @@ const observation = computed<Observation>(() => {
 
 const showCough = computed(() => !!observation.value.items.cough)
 const showAbnormalStool = computed(() => !!observation.value.items.abnormalStool)
+const showTrikafta = computed(() => !!observation.value.items.trikafta)
 
 const possibleCough = computed<CoughTypes[]>(() => ["dry", "productive"])
 const cough = ref<CoughTypes>()
 const possibleStool = computed<AbnormalStoolTypes[]>(() => ["greasy", "hard", "diarrhea"])
 const abnormalStool = ref<AbnormalStoolTypes>()
+const possibleMedicationTimes = computed(() => medicationTimes)
+const trikaftaTimes = ref<(typeof medicationTimes)[number][]>([])
+
+const enzymes = ref<Enzymes>({
+   Breakfast: { withEnzymes: 0, withoutEnzymes: 1 },
+   Lunch: { withEnzymes: 0, withoutEnzymes: 1 },
+   Dinner: { withEnzymes: 0, withoutEnzymes: 1 },
+   Snack: { withEnzymes: 0, withoutEnzymes: 0 },
+})
+
+const numberRules = computed(() => [
+   (value: number) => value >= 0 || "Number must be non-negative",
+   (value: number) => Number.isInteger(value) || "Number must be an integer",
+])
+
+const prettyJson = computed(() => JSON.stringify(observation.value, null, 2))
 
 function submit() {
    addObservation(observation.value)

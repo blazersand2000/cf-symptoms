@@ -26,9 +26,12 @@ export interface SelectableTimesOfDay extends ObservationItem {
    timesTaken: (typeof medicationTimes)[number][]
 }
 
-const medicationTimes = ["AM", "PM"] as const
+export const medicationTimes = ["AM", "PM"] as const
 
-type Enzymes = Record<"Breakfast" | "Lunch" | "Dinner" | "Snack", number>
+export type Enzymes = Record<
+   "Breakfast" | "Lunch" | "Dinner" | "Snack",
+   { withEnzymes: number; withoutEnzymes: number }
+>
 
 export interface Items<T = null> {
    collarBoneRetraction?: T extends null ? ObservationItem : ObservationItem & T
@@ -64,4 +67,4 @@ export interface ObservationInfoItem {
 
 export type ObservationInfo = Record<keyof Items, ObservationInfoItem>
 
-type ObservationType = "respiratory" | "pancreatic"
+type ObservationType = "respiratory" | "pancreatic" | "medication" | "other"

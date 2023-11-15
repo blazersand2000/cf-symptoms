@@ -31,7 +31,9 @@ onMounted(() => {
                   { x: 1, y: 1, v: 40 },
                ],
                backgroundColor: function (context) {
-                  var value = context.dataset.data[context.dataIndex].v
+                  var value = (
+                     context.dataset.data[context.dataIndex] as { x: number; y: number; v: number }
+                  ).v
                   var alpha = (value - 10) / 40
                   return alpha > 0.5 ? "rgba(0, 128, 0, 1)" : "rgba(0, 128, 0, 0.5)"
                },

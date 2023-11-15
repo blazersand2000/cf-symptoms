@@ -91,6 +91,31 @@ const globalObservationInfo: ObservationInfo = {
       type: "pancreatic",
       icon: "mdi-account-alert",
    },
+   trikafta: {
+      displayName: "Trikafta",
+      type: "medication",
+      icon: "mdi-pill",
+   },
+   vitaminD: {
+      displayName: "Vitamin D",
+      type: "medication",
+      icon: "mdi-pill",
+   },
+   salt: {
+      displayName: "Salt",
+      type: "medication",
+      icon: "mdi-pill",
+   },
+   dekas: {
+      displayName: "Dekas",
+      type: "medication",
+      icon: "mdi-pill",
+   },
+   enzymes: {
+      displayName: "Enzymes",
+      type: "other",
+      icon: "",
+   },
 }
 
 function convertFromSavedToDisplayedObservations(
