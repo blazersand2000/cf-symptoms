@@ -41,7 +41,7 @@
 import SymptomsForm from "@/components/SymptomsForm.vue"
 import { computed, ref } from "vue"
 import { useObservations } from "@/composables/observations"
-import ObservationCard from "@/components/ObservationCard.vue"
+import ObservationCard from "@/components/observations/ObservationCard.vue"
 import Loading from "@/components/Loading.vue"
 
 const { isLoading, allObservations } = useObservations()

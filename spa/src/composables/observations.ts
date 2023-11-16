@@ -1,4 +1,3 @@
-import { useObservationsStore } from "@/stores/observations"
 import type {
    ObservationInfo,
    SavedObservation,
@@ -43,77 +42,77 @@ export function useObservations() {
 const globalObservationInfo: ObservationInfo = {
    collarBoneRetraction: {
       displayName: "Retraction above the collarbone",
-      type: "respiratory",
+      category: "respiratory",
       icon: "mdi-account-arrow-left",
    },
    ribRetraction: {
       displayName: "Retraction in the rib area",
-      type: "respiratory",
+      category: "respiratory",
       icon: "mdi-account-arrow-left",
    },
    cough: {
       displayName: "Coughing",
-      type: "respiratory",
+      category: "respiratory",
       icon: "mdi-account-voice",
    },
    aspiration: {
       displayName: "Aspiration",
-      type: "respiratory",
+      category: "respiratory",
       icon: "mdi-lungs",
    },
    mouthBreathing: {
       displayName: "Mouth breathing",
-      type: "respiratory",
+      category: "respiratory",
       icon: "mdi-emoticon-frown",
    },
    abnormalStool: {
       displayName: "Abnormal stools",
-      type: "pancreatic",
+      category: "pancreatic",
       icon: "mdi-emoticon-poop",
    },
    constipation: {
       displayName: "Constipation",
-      type: "pancreatic",
+      category: "pancreatic",
       icon: "mdi-filter-remove-outline",
    },
    diaperRash: {
       displayName: "Diaper rash",
-      type: "pancreatic",
+      category: "pancreatic",
       icon: "mdi-human-baby-changing-table",
    },
    bloating: {
       displayName: "Bloating",
-      type: "pancreatic",
+      category: "pancreatic",
       icon: "mdi-human-pregnant",
    },
    tummyPain: {
       displayName: "Tummy pain",
-      type: "pancreatic",
+      category: "pancreatic",
       icon: "mdi-account-alert",
    },
    trikafta: {
       displayName: "Trikafta",
-      type: "medication",
+      category: "medication",
       icon: "mdi-pill",
    },
    vitaminD: {
       displayName: "Vitamin D",
-      type: "medication",
+      category: "medication",
       icon: "mdi-pill",
    },
    salt: {
       displayName: "Salt",
-      type: "medication",
+      category: "medication",
       icon: "mdi-pill",
    },
    dekas: {
       displayName: "Dekas",
-      type: "medication",
+      category: "medication",
       icon: "mdi-pill",
    },
    enzymes: {
       displayName: "Enzymes",
-      type: "other",
+      category: "other",
       icon: "",
    },
 }

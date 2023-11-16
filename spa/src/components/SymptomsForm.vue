@@ -216,13 +216,13 @@ const emit = defineEmits<{
 const { observationInfo, addObservation } = useObservations()
 
 const possibleRespiratory = computed(() =>
-   Object.entries(observationInfo.value).filter((entry) => entry[1].type === "respiratory")
+   Object.entries(observationInfo.value).filter((entry) => entry[1].category === "respiratory")
 )
 const possiblePancreatic = computed(() =>
-   Object.entries(observationInfo.value).filter((entry) => entry[1].type === "pancreatic")
+   Object.entries(observationInfo.value).filter((entry) => entry[1].category === "pancreatic")
 )
 const possibleMedications = computed(() =>
-   Object.entries(observationInfo.value).filter((entry) => entry[1].type === "medication")
+   Object.entries(observationInfo.value).filter((entry) => entry[1].category === "medication")
 )
 
 const window = ref(0)
@@ -248,23 +248,32 @@ const observation = computed<Observation>(() => {
       } else if (key === "trikafta") {
          obs.items[key] = { timesTaken: trikaftaTimes.value }
       } else if (key === "enzymes") {
-         obs.items[key] = {
-            Breakfast: {
-               withEnzymes: enzymes.value?.Breakfast.withEnzymes ?? 0,
-               withoutEnzymes: enzymes.value?.Breakfast.withoutEnzymes ?? 0,
-            },
-            Lunch: {
-               withEnzymes: enzymes.value?.Lunch.withEnzymes ?? 0,
-               withoutEnzymes: enzymes.value?.Lunch.withoutEnzymes ?? 0,
-            },
-            Dinner: {
-               withEnzymes: enzymes.value?.Dinner.withEnzymes ?? 0,
-               withoutEnzymes: enzymes.value?.Dinner.withoutEnzymes ?? 0,
-            },
-            Snack: {
-               withEnzymes: enzymes.value?.Snack.withEnzymes ?? 0,
-               withoutEnzymes: enzymes.value?.Snack.withoutEnzymes ?? 0,
-            },
+         const tookEnzymes = (enzymes: Enzymes) =>
+            enzymes.Breakfast.withEnzymes > 0 ||
+            enzymes.Lunch.withEnzymes > 0 ||
+            enzymes.Dinner.withEnzymes > 0 ||
+            enzymes.Snack.withEnzymes > 0 ||
+            enzymes.Snack.withoutEnzymes > 0
+
+         if (tookEnzymes(enzymes.value)) {
+            obs.items[key] = {
+               Breakfast: {
+                  withEnzymes: enzymes.value.Breakfast.withEnzymes ?? 0,
+                  withoutEnzymes: enzymes.value.Breakfast.withoutEnzymes ?? 0,
+               },
+               Lunch: {
+                  withEnzymes: enzymes.value.Lunch.withEnzymes ?? 0,
+                  withoutEnzymes: enzymes.value.Lunch.withoutEnzymes ?? 0,
+               },
+               Dinner: {
+                  withEnzymes: enzymes.value.Dinner.withEnzymes ?? 0,
+                  withoutEnzymes: enzymes.value.Dinner.withoutEnzymes ?? 0,
+               },
+               Snack: {
+                  withEnzymes: enzymes.value.Snack.withEnzymes ?? 0,
+                  withoutEnzymes: enzymes.value.Snack.withoutEnzymes ?? 0,
+               },
+            }
          }
       } else {
          obs.items[key] = {}

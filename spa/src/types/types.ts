@@ -61,7 +61,7 @@ interface BaseObservation<T = null> {
 
 export interface ObservationInfoItem {
    displayName: string
-   type: ObservationType
+   category: ObservationType
    icon: string
 }
 
