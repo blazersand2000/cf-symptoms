@@ -18,7 +18,7 @@ import { onMounted } from "vue"
 
 const uiConfig = {
    callbacks: {
-      signInSuccessWithAuthResult: function (authResult: any, redirectUrl: any) {
+      signInSuccessWithAuthResult: function () {
          // User successfully signed in.
          // Return type determines whether we continue the redirect automatically
          // or whether we leave that to developer to handle.

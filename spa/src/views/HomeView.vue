@@ -28,10 +28,15 @@
          </v-col>
       </v-row>
       <v-row v-if="isLoading">
-         <Loading />
+         <loading-spinner />
       </v-row>
       <v-row justify="center">
-         <v-col cols="12" class="d-flex justify-center" v-for="observation in allObservations">
+         <v-col
+            cols="12"
+            class="d-flex justify-center"
+            v-for="observation in allObservations"
+            :key="observation.formattedTimestamp"
+         >
             <ObservationCard :observation="observation" />
          </v-col>
       </v-row>
@@ -39,10 +44,10 @@
 </template>
 <script setup lang="ts">
 import SymptomsForm from "@/components/SymptomsForm.vue"
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import { useObservations } from "@/composables/observations"
 import ObservationCard from "@/components/observations/ObservationCard.vue"
-import Loading from "@/components/Loading.vue"
+import LoadingSpinner from "@/components/LoadingSpinner.vue"
 
 const { isLoading, allObservations } = useObservations()
 

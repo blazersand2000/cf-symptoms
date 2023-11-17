@@ -16,7 +16,7 @@ const store = useErrorsStore()
 
 watch(
    () => store.currentError,
-   (newError, oldError) => {
+   (newError) => {
       if (newError) {
          showMessage(newError.userFriendlyDescription, timeout.value)
       }

@@ -50,7 +50,7 @@
          <LoginView v-if="showLogin" />
          <RouterView v-else />
       </v-main>
-      <Alert />
+      <AlertBar />
    </v-app>
 </template>
 <script setup lang="ts">
@@ -58,7 +58,7 @@ import { RouterView, useRouter } from "vue-router"
 import { computed, ref } from "vue"
 import { useAuth } from "@/composables/auth"
 import LoginView from "@/views/LoginView.vue"
-import Alert from "./components/Alert.vue"
+import AlertBar from "./components/AlertBar.vue"
 import { useDisplay } from "vuetify"
 
 const { loggedInUser, logout } = useAuth()

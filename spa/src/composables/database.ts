@@ -7,16 +7,11 @@ import {
    type Unsubscribe,
    query,
    orderBy,
-   where,
 } from "firebase/firestore"
 import { ref, computed, watch } from "vue"
 import { useAuth } from "./auth" // replace with your auth composable path
 import type { SavedObservation } from "@/types/types"
 import type { FirebaseError } from "firebase/app"
-
-interface User {
-   // Define your user properties here
-}
 
 export function useDatabase(onError: ((error: string) => void) | null = null) {
    const db = getFirestore()
@@ -31,7 +26,7 @@ export function useDatabase(onError: ((error: string) => void) | null = null) {
       }
    }
 
-   watch(loggedInUser, (value, prev) => {
+   watch(loggedInUser, (value) => {
       if (unsubscribe.value) {
          unsubscribe.value()
       }

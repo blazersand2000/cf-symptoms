@@ -305,7 +305,7 @@ const numberRules = computed(() => [
    (value: number) => Number.isInteger(value) || "Number must be an integer",
 ])
 
-const prettyJson = computed(() => JSON.stringify(observation.value, null, 2))
+// const prettyJson = computed(() => JSON.stringify(observation.value, null, 2))
 
 function submit() {
    addObservation(observation.value)
@@ -313,8 +313,5 @@ function submit() {
 }
 
 const images = ref<string[]>([])
-function addSnack() {
-   images.value.push("/snack.png")
-}
 </script>
 <style scoped></style>

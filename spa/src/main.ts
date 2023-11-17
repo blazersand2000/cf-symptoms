@@ -29,7 +29,7 @@ const vuetify = createVuetify({
    },
 });
 
-var firebaseConfig = {
+const firebaseConfig = {
    apiKey: "AIzaSyAO5ytuKmgtcmOSZdPhR1cE3jB7uznKgls",
    authDomain: "cf-symptoms.firebaseapp.com",
    // The value of `databaseURL` depends on the location of the database
