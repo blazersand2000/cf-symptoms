@@ -30,8 +30,14 @@
       </v-app-bar>
       <div v-show="isMobile">
          <v-navigation-drawer v-model="drawer">
-            <v-list :items="navRoutes" />
             <v-list>
+               <v-list-item
+                  v-for="route in navRoutes"
+                  :key="route.to"
+                  :to="route.to"
+                  :title="route.title"
+                  :prepend-icon="route.icon"
+               />
                <v-divider></v-divider>
                <v-list-item>
                   <v-list-item-subtitle>{{ userGreeting }}</v-list-item-subtitle>
@@ -78,12 +84,13 @@ const navRoutes = computed(() => {
    return router.options.routes
       .filter((route) => route.meta?.showInNav)
       .map((route) => ({
-         title: route.meta?.title || "",
+         title: (route.meta?.title as string) || "",
          value: route.path,
-         icon: route.meta?.icon || "",
+         icon: (route.meta?.icon as string) || "",
          to: route.path,
          props: {
             to: route.path,
+            exact: true,
          },
       }))
 })

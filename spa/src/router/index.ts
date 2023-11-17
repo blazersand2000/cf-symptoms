@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router"
 import ChartsView from "@/views/ChartsView.vue"
 import HomeView from "@/views/HomeView.vue"
+import UnderConstructionView from "@/views/UnderConstructionView.vue"
 import NotFoundView from "@/views/NotFoundView.vue"
 
 const router = createRouter({
@@ -15,7 +16,7 @@ const router = createRouter({
       {
          path: "/charts",
          name: "charts",
-         component: ChartsView,
+         component: UnderConstructionView,
          meta: { showInNav: true, title: "Charts", icon: "mdi-chart-line" },
       },
       {
