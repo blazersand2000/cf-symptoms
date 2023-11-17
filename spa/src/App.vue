@@ -1,8 +1,21 @@
 <template>
    <v-app class="rounded rounded-md">
-      <v-app-bar title="CF Tracker">
+      <v-app-bar>
+         <div v-show="isMobile && !showLogin">
+            <v-app-bar-nav-icon @click.stop="drawer = !drawer" />
+         </div>
+         <div :class="{ 'd-flex align-center': !isMobile }">
+            <v-toolbar-title class="ml-3 mr-5">CF Tracker</v-toolbar-title>
+            <div v-show="!isMobile && !showLogin">
+               <v-toolbar-items>
+                  <v-list-item v-for="route in navRoutes" :key="route.to" :to="route.to">{{
+                     route.title
+                  }}</v-list-item>
+               </v-toolbar-items>
+            </div>
+         </div>
          <template v-slot:append v-if="!showLogin">
-            <div class="text-subtitle-1">{{ userGreeting }}</div>
+            <div class="text-subtitle-1" v-show="!isMobile">{{ userGreeting }}</div>
             <v-menu>
                <template v-slot:activator="{ props }">
                   <v-btn v-bind="props" icon="mdi-dots-vertical"></v-btn>
@@ -15,18 +28,17 @@
             </v-menu>
          </template>
       </v-app-bar>
-
-      <!-- <v-navigation-drawer>
-      <v-list>
-        <v-list-item title="Navigation drawer">
-         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-
-        </v-list-item>
-      </v-list>
-    </v-navigation-drawer> -->
-
-      <!-- <v-main class="d-flex align-center justify-center" style="min-height: 300px;"> -->
+      <div v-show="isMobile">
+         <v-navigation-drawer v-model="drawer">
+            <v-list :items="navRoutes" />
+            <v-list>
+               <v-divider></v-divider>
+               <v-list-item>
+                  <v-list-item-subtitle>{{ userGreeting }}</v-list-item-subtitle>
+               </v-list-item>
+            </v-list>
+         </v-navigation-drawer>
+      </div>
 
       <v-main class="d-flex justify-center" style="min-height: 300px">
          <LoginView v-if="showLogin" />
@@ -36,13 +48,21 @@
    </v-app>
 </template>
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router"
+import { RouterView, useRouter } from "vue-router"
 import { computed, ref } from "vue"
 import { useAuth } from "@/composables/auth"
 import LoginView from "@/views/LoginView.vue"
 import Alert from "./components/Alert.vue"
+import { useDisplay } from "vuetify"
 
 const { loggedInUser, logout } = useAuth()
+
+const drawer = ref(false)
+
+const display = useDisplay()
+const router = useRouter()
+
+const isMobile = computed(() => display.smAndDown.value)
 
 const showLogin = computed(() => !loggedInUser.value)
 
@@ -52,6 +72,20 @@ const userGreeting = computed(() => {
    }
    const displayedUser = loggedInUser.value.displayName ?? loggedInUser.value.email
    return `Hello, ${displayedUser}`
+})
+
+const navRoutes = computed(() => {
+   return router.options.routes
+      .filter((route) => route.meta?.showInNav)
+      .map((route) => ({
+         title: route.meta?.title || "",
+         value: route.path,
+         icon: route.meta?.icon || "",
+         to: route.path,
+         props: {
+            to: route.path,
+         },
+      }))
 })
 </script>
 <style scoped></style>
