@@ -47,8 +47,10 @@
       </div>
 
       <v-main class="d-flex justify-center" style="min-height: 300px">
-         <LoginView v-if="showLogin" />
-         <RouterView v-else />
+         <v-container style="max-width: 1200px">
+            <LoginView v-if="showLogin" />
+            <RouterView v-else />
+         </v-container>
       </v-main>
       <AlertBar />
    </v-app>

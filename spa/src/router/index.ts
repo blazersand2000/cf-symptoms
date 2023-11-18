@@ -16,7 +16,7 @@ const router = createRouter({
       {
          path: "/charts",
          name: "charts",
-         component: UnderConstructionView,
+         component: ChartsView,
          meta: { showInNav: true, title: "Charts", icon: "mdi-chart-line" },
       },
       {
