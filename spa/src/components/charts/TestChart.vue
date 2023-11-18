@@ -1,5 +1,5 @@
 <template>
-   <div class="chart-container" style="position: relative; height: 80vh; width: 80vw">
+   <div class="chart-container" style="position: relative; height: 80vh">
       <canvas ref="canvas"></canvas>
    </div>
    <!-- pretty print chartdata.data for debugging -->
