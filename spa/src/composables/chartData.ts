@@ -35,7 +35,7 @@ export function useChartData() {
       const dates = Array.from({ length: 30 }, (_, i) => {
          const date = new Date(currentDay.value)
          date.setDate(date.getDate() - i)
-         return date.toISOString().split("T")[0] // Format as YYYY-MM-DD
+         return formatDateLocal(date) // Format as YYYY-MM-DD in local timezone
       })
 
       // Create an array of objects for every combination of last 30 dates and observationInfo properties
@@ -45,11 +45,26 @@ export function useChartData() {
             const matchingObservations = observations.allObservations.value.filter(
                (observation) => {
                   const observationDate = new Date(observation.timestamp)
-                  return (
-                     observationDate.toISOString().split("T")[0] === date &&
-                     key in observation.items && // Type guard
-                     observation.items[key as keyof typeof observation.items] != null
-                  )
+                  if (formatDateLocal(observationDate) !== date) {
+                     return false
+                  }
+                  if (!(key in observation.items)) {
+                     return false
+                  }
+                  const item = observation.items[key as keyof typeof observation.items]
+                  if (!item) {
+                     return false
+                  }
+                  if ("Breakfast" in item) {
+                     return (
+                        item.Breakfast.withEnzymes +
+                           item.Lunch.withEnzymes +
+                           item.Dinner.withEnzymes +
+                           item.Snack.withEnzymes >
+                        0
+                     )
+                  }
+                  return true
                }
             )
 
@@ -65,4 +80,11 @@ export function useChartData() {
    })
 
    return { isLoading: observations.isLoading, data }
+}
+
+function formatDateLocal(date: Date): string {
+   const year = date.getFullYear()
+   const month = String(date.getMonth() + 1).padStart(2, "0") // Months are 0-indexed
+   const day = String(date.getDate()).padStart(2, "0")
+   return `${year}-${month}-${day}`
 }
